@@ -1,0 +1,18 @@
+#!/bin/sh
+
+IP=$(curl -s icanhazip.com)
+eval "export $(egrep -z DBUS_SESSION_BUS_ADDRESS /proc/$(pgrep -u $LOGNAME gnome-session)/environ)";
+if [ -e ~/.current-ip.txt ]
+then
+  CURRENT=$(cat ~/.current-ip.txt)
+  if [ $CURRENT = $IP ]
+  then
+    DISPLAY=:0 notify-send "IP Checker" "IP address is the same: $IP"
+  else
+    DISPLAY=:0 notify-send -u critical "IP Checker" "IP address has changed to: $IP"
+    echo $IP > ~/.current-ip.txt 
+  fi
+else
+  DISPLAY=:0 notify-send "IP Checker" "No IP on record, writing it now"
+  echo $IP > ~/.current-ip.txt
+fi
